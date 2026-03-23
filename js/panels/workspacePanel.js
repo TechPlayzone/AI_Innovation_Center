@@ -3,6 +3,7 @@
 
 import { WORKSPACE_CONTENT } from "../config/workspaceContent.js";
 import { sendTextToWayne } from "../services/elevenLabsClient.js";
+import { addTranscriptMessage } from "./transcriptPanel.js";
 import { state } from "../state/sessionState.js";
 
 export function initWorkspacePanel() {
@@ -72,6 +73,7 @@ export function renderMajorWorkspace(majorKey) {
     el.addEventListener("click", () => {
       if (!state.sessionActive) return;
       sendTextToWayne(el.dataset.question);
+      addTranscriptMessage("user", el.dataset.question, true);
       const statusEl = document.getElementById("status");
       if (statusEl) statusEl.textContent = `You asked: "${el.dataset.question}"`;
     });

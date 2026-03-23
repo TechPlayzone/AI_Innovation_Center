@@ -3,13 +3,14 @@
 
 const MAX_TRANSCRIPT_MESSAGES = 100;
 
-export function addTranscriptMessage(role, text) {
+export function addTranscriptMessage(role, text, clicked = false) {
   const transcriptEl = document.getElementById("transcript");
   if (!transcriptEl) return;
 
   transcriptEl.style.display = "block";
   const div = document.createElement("div");
   div.className = role === "user" ? "msg-user" : role === "agent" ? "msg-agent" : "msg-system";
+  if (clicked) div.classList.add("msg-clicked");
   div.textContent = (role === "user" ? "You: " : role === "agent" ? "Wayne: " : "") + text;
   transcriptEl.appendChild(div);
 

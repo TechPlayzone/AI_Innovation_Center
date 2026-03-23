@@ -79,6 +79,7 @@ button {
   display: none; line-height: 1.5;
 }
 .msg-user { color: #4FC3F7; margin-bottom: 4px; }
+.msg-user.msg-clicked { color: #FFD54F; }
 .msg-agent { color: #81C784; margin-bottom: 4px; }
 .msg-system { color: #999; font-style: italic; margin-bottom: 4px; }
 
