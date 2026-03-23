@@ -1,8 +1,8 @@
 // panels/waynePanel.js
-// Owns all Wayne avatar UI — video, loading overlay, status
+// Owns all Wayne avatar UI — video, loading overlay, splash screen, status
 
 export function initWaynePanel() {
-  // Panel is initialized via HTML — nothing to bootstrap yet
+  // Panel initialized via HTML
 }
 
 export function showWayneLoading(text = "Starting Wayne...") {
@@ -22,6 +22,16 @@ export function hideWayneLoading() {
   if (overlay) overlay.classList.remove("visible");
 }
 
+export function hideSplash() {
+  const splash = document.getElementById("wayne-splash");
+  if (splash) splash.classList.add("hidden");
+}
+
+export function showSplash() {
+  const splash = document.getElementById("wayne-splash");
+  if (splash) splash.classList.remove("hidden");
+}
+
 export function clearAvatarMedia() {
   const container = document.getElementById("avatar-container");
   if (container) container.querySelectorAll("video").forEach(el => el.remove());
@@ -30,6 +40,7 @@ export function clearAvatarMedia() {
 export function resetWaynePanel() {
   clearAvatarMedia();
   hideWayneLoading();
+  showSplash();
   document.querySelectorAll("audio").forEach(a => a.remove());
 }
 
@@ -41,8 +52,9 @@ export function attachWayneMedia(room) {
       clearAvatarMedia();
       const el = track.attach();
       hideWayneLoading();
+      hideSplash();  // Hide splash when live video starts
       container.appendChild(el);
-      console.log("[Wayne Panel] Video attached");
+      console.log("[Wayne Panel] Video attached — splash hidden");
     }
     if (track.kind === "audio") {
       const audioEl = track.attach();

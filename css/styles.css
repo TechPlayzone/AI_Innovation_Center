@@ -313,3 +313,19 @@ button {
 .welcome-hint strong {
   color: #0097A7;
 }
+
+/* ===== WAYNE SPLASH SCREEN ===== */
+#wayne-splash {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 1;
+  border-radius: 12px;
+}
+
+#wayne-splash.hidden {
+  display: none;
+}
