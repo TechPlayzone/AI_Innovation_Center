@@ -3,60 +3,125 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI In My Field - Avatar Assistant</title>
+  <title>AI In My Field - Hillsborough College</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
-  <h1>AI In My Field - Avatar Assistant - Beta</h1>
-  <p class="subtitle">Created by Desh Bagley using Eleven Labs and HeyGen &bull; Hillsborough College AI Innovation Center</p>
-
-  <div style="text-align:center;">
-    <img src="AI_center_chatgpt.png" width="60%" alt="Hillsborough College AI Innovation Center logo">
-    <br><br>
+  <!-- TOP BAR -->
+  <div id="top-bar">
+    <div id="top-bar-left">
+      <span id="app-logo">🎓</span>
+      <span id="app-title">AI in My Field</span>
+    </div>
+    <div id="top-bar-center">
+      Hillsborough College AI Innovation Center &nbsp;|&nbsp; <span id="wayne-title-name">Wayne, Your AI Field Guide</span>
+    </div>
+    <div id="top-bar-right">
+      <button id="startBtn">▶ Start Session</button>
+      <button id="stopBtn" style="display:none;">■ End Session</button>
+    </div>
   </div>
 
-  <div id="major-select-wrap">
-    <label for="majorSelect">Select Your Major:</label>
-    <select id="majorSelect">
-      <option value="general">General / Exploring</option>
-      <option value="cloud">Cloud Computing</option>
-      <option value="construction">Construction Management</option>
-      <option value="architecture">Architecture</option>
-      <option value="electronics">Electronics Engineering Technology</option>
-      <option value="accounting">Accounting</option>
-      <option value="business">Business &amp; Entrepreneurship</option>
-      <option value="cybersecurity">Cybersecurity</option>
-    </select>
+  <!-- STATUS BAR -->
+  <div id="status-bar">
+    <span id="status">Select your major, then click Start Session to begin.</span>
   </div>
 
-  <p id="status">You will use the laptop's microphone to give prompts to the AI Field Guide. First, select your major, then click Start Session.</p>
+  <!-- THREE PANEL LAYOUT -->
+  <div id="app-layout">
 
-  <div class="controls">
-    <button id="startBtn">Start Session</button>
-    <button id="stopBtn">End Session</button>
-  </div>
+    <!-- LEFT SIDEBAR -->
+    <div id="left-sidebar">
 
-  <!-- Side by side layout -->
-  <div id="main-layout">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Select Your Major</div>
+        <select id="majorSelect">
+          <option value="general">General / Exploring</option>
+          <option value="cloud">Cloud Computing</option>
+          <option value="construction">Construction Management</option>
+          <option value="architecture">Architecture</option>
+          <option value="electronics">Electronics Engineering Technology</option>
+          <option value="accounting">Accounting</option>
+          <option value="business">Business &amp; Entrepreneurship</option>
+          <option value="cybersecurity">Cybersecurity</option>
+        </select>
+      </div>
 
-    <!-- Left: Wayne Avatar -->
-    <div id="avatar-container">
-      <img id="wayne-splash" src="wayne_splashscreen.png" alt="Wayne AI Field Guide" />
-      <div id="loading-overlay">
-        <div class="spinner"></div>
-        <div class="loading-text" id="loading-text">Starting Wayne...</div>
+      <div class="sidebar-section" id="tools-section">
+        <div class="sidebar-label">🛠️ AI Tools in Your Field</div>
+        <div id="sidebar-tools"></div>
+      </div>
+
+      <div class="sidebar-section" id="questions-section">
+        <div class="sidebar-label">🎤 Ask Wayne</div>
+        <div class="sidebar-sublabel" id="ask-wayne-hint">Start a session to ask Wayne these questions.</div>
+        <div id="sidebar-questions"></div>
+      </div>
+
+    </div>
+
+    <!-- CENTER: ASK CLAUDE HERO -->
+    <div id="center-panel">
+      <div id="center-header">
+        <span id="center-title">✨ Ask Claude</span>
+        <span id="center-subtitle">Engage directly with Claude for document analysis, career planning, and more.</span>
+      </div>
+
+      <!-- File upload drop zone -->
+      <div id="file-drop-zone">
+        <span class="file-icon">📄</span>
+        <span class="file-icon">📊</span>
+        <span class="file-icon">🖼️</span>
+        <label for="claude-file-input" id="upload-btn">⬆️ Upload Files</label>
+        <input type="file" id="claude-file-input" accept=".png,.jpg,.jpeg,.webp,.gif,.pdf,.txt,.csv,.docx,.pptx,.xlsx" style="display:none" />
+      </div>
+      <div id="file-chips"></div>
+
+      <!-- Chat messages -->
+      <div id="chat-messages"></div>
+
+      <!-- Input bar -->
+      <div id="chat-input-bar">
+        <label for="chat-file-attach" class="attach-btn" title="Attach file">📎</label>
+        <input type="file" id="chat-file-attach" accept=".png,.jpg,.jpeg,.webp,.gif,.pdf,.txt,.csv,.docx,.pptx,.xlsx" style="display:none" />
+        <textarea id="chat-input" placeholder="Ask Claude a question or upload files above..." rows="1"></textarea>
+        <button id="chat-mic-btn" title="Using microphone for Wayne">🎙️</button>
+        <button id="chat-send-btn" title="Send to Claude">➤</button>
       </div>
     </div>
 
-    <!-- Right: Workspace Panel -->
-    <div id="workspace-panel"></div>
+    <!-- RIGHT: WAYNE + TRANSCRIPT -->
+    <div id="right-panel">
+
+      <!-- Wayne Avatar -->
+      <div id="wayne-container">
+        <img id="wayne-splash" src="wayne_splashscreen.png" alt="Wayne AI Field Guide" />
+        <div id="loading-overlay">
+          <div class="spinner"></div>
+          <div class="loading-text" id="loading-text">Starting Wayne...</div>
+        </div>
+      </div>
+      <div id="wayne-label">Wayne, Your AI Field Guide</div>
+
+      <!-- Transcript -->
+      <div id="transcript-section">
+        <div id="transcript-header">
+          <span>📝 Transcript</span>
+          <div id="transcript-controls">
+            <span id="transcript-toggle-label">Show</span>
+            <div id="transcript-toggle" class="toggle-off" title="Toggle transcript"></div>
+          </div>
+        </div>
+        <div id="transcript" style="display:none;"></div>
+        <button id="export-transcript-btn">⬇️ Export Transcript</button>
+      </div>
+
+    </div>
 
   </div>
 
-  <div id="transcript"></div>
-
-  <p class="version-tag">AI in My Field - Avatar Assistant written by Desh Bagley, Associate Dean at Hillsborough College &bull; v5.1 &bull; March 2026</p>
+  <p class="version-tag">AI in My Field &bull; Hillsborough College AI Innovation Center &bull; Created by Desh Bagley, Associate Dean &bull; v6.0 &bull; March 2026</p>
 
   <script type="module" src="js/app.js"></script>
 

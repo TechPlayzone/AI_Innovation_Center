@@ -1,121 +1,229 @@
-// panels/generativePanel.js
-// Handles text input, file upload, and Claude generation via Firebase backend
+// panels/generativePanel.js v6.0
+// Chat-style center panel — Ask Claude hero
 
 import { state } from "../state/sessionState.js";
 import { generateWithClaude } from "../services/backendApi.js";
 
 const SUPPORTED_TYPES = {
-  "image/png": "image",
-  "image/jpeg": "image",
-  "image/webp": "image",
-  "image/gif": "image",
+  "image/png": "image", "image/jpeg": "image",
+  "image/webp": "image", "image/gif": "image",
   "application/pdf": "pdf",
-  "text/plain": "text",
-  "text/csv": "text",
+  "text/plain": "text", "text/csv": "text",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
 };
 
-const ACCEPTED_EXTENSIONS = ".png,.jpg,.jpeg,.webp,.gif,.pdf,.txt,.csv,.docx,.pptx,.xlsx";
-
-let currentFile = null;
+let pendingFiles = []; // files attached but not yet sent
 let isGenerating = false;
 
-export function renderGenerativePanel(container) {
-  const section = document.createElement("div");
-  section.className = "workspace-section generative-section";
-  section.id = "generative-section";
-  section.innerHTML = `
-    <div class="workspace-section-title">✨ Generative AI</div>
-    <p class="generative-hint">Type a question or upload a file and get an instant written response.</p>
+export function initGenerativePanel() {
+  const dropZoneInput = document.getElementById("claude-file-input");
+  const attachInput   = document.getElementById("chat-file-attach");
+  const sendBtn       = document.getElementById("chat-send-btn");
+  const chatInput     = document.getElementById("chat-input");
 
-    <div class="generative-input-wrap">
-      <textarea id="generative-input" placeholder="Type your question or describe what you want Claude to do with your file..." rows="3"></textarea>
+  // File from drop zone
+  dropZoneInput?.addEventListener("change", () => handleFileAdd(dropZoneInput.files[0]));
 
-      <div class="generative-file-wrap">
-        <label for="generative-file" class="file-label" id="file-label">
-          📎 Attach file
-          <span class="file-types">PNG, JPG, PDF, TXT, CSV, DOCX, PPTX, XLSX</span>
-        </label>
-        <input type="file" id="generative-file" accept="${ACCEPTED_EXTENSIONS}" style="display:none" />
-        <button class="file-clear-btn" id="file-clear-btn" style="display:none">✕ Remove</button>
-      </div>
+  // File from attach button in input bar
+  attachInput?.addEventListener("change", () => handleFileAdd(attachInput.files[0]));
 
-      <button class="generative-submit-btn" id="generative-submit-btn">
-        ✨ Generate
-      </button>
+  // Send on button click
+  sendBtn?.addEventListener("click", () => handleSend());
+
+  // Send on Enter (Shift+Enter for newline)
+  chatInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  });
+
+  // Auto-resize textarea
+  chatInput?.addEventListener("input", () => {
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+  });
+}
+
+function handleFileAdd(file) {
+  if (!file) return;
+  const type = SUPPORTED_TYPES[file.type];
+  if (!type) {
+    addErrorMessage(`Unsupported file type: ${file.name}`);
+    return;
+  }
+  pendingFiles.push(file);
+  renderFileChips();
+}
+
+function renderFileChips() {
+  const chips = document.getElementById("file-chips");
+  if (!chips) return;
+  chips.innerHTML = pendingFiles.map((f, i) => `
+    <div class="file-chip">
+      <span>${getFileEmoji(f)} ${f.name}</span>
+      <span class="file-chip-remove" data-index="${i}">✕</span>
     </div>
+  `).join("");
 
-    <div id="generative-output-area"></div>
-  `;
-
-  container.appendChild(section);
-  wireGenerativePanel();
-}
-
-function wireGenerativePanel() {
-  const fileInput    = document.getElementById("generative-file");
-  const fileLabel    = document.getElementById("file-label");
-  const fileClearBtn = document.getElementById("file-clear-btn");
-  const submitBtn    = document.getElementById("generative-submit-btn");
-
-  fileInput?.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-    const type = SUPPORTED_TYPES[file.type];
-    if (!type) {
-      showGenerativeError(`Unsupported file type: ${file.name}`);
-      fileInput.value = "";
-      return;
-    }
-    currentFile = file;
-    fileLabel.innerHTML = `📄 ${file.name} <span class="file-types">${(file.size / 1024).toFixed(0)} KB</span>`;
-    fileClearBtn.style.display = "inline-block";
-  });
-
-  fileClearBtn?.addEventListener("click", () => {
-    currentFile = null;
-    fileInput.value = "";
-    fileLabel.innerHTML = `📎 Attach file <span class="file-types">PNG, JPG, PDF, TXT, CSV, DOCX, PPTX, XLSX</span>`;
-    fileClearBtn.style.display = "none";
-  });
-
-  submitBtn?.addEventListener("click", async () => {
-    if (isGenerating) return;
-    const input = document.getElementById("generative-input");
-    const prompt = input?.value.trim();
-    if (!prompt && !currentFile) {
-      showGenerativeError("Please type a question or attach a file.");
-      return;
-    }
-    await runGeneration(prompt, currentFile);
+  chips.querySelectorAll(".file-chip-remove").forEach(el => {
+    el.addEventListener("click", () => {
+      pendingFiles.splice(parseInt(el.dataset.index), 1);
+      renderFileChips();
+    });
   });
 }
 
-async function runGeneration(prompt, file) {
+function getFileEmoji(file) {
+  const type = SUPPORTED_TYPES[file.type];
+  if (type === "image") return "🖼️";
+  if (type === "pdf") return "📄";
+  if (type === "docx" || type === "pptx") return "📝";
+  if (type === "xlsx") return "📊";
+  return "📁";
+}
+
+async function handleSend() {
+  if (isGenerating) return;
+  const chatInput = document.getElementById("chat-input");
+  const prompt = chatInput?.value.trim();
+
+  if (!prompt && pendingFiles.length === 0) return;
+
+  // Add user message to chat
+  const files = [...pendingFiles];
+  pendingFiles = [];
+  renderFileChips();
+
+  addUserMessage(prompt, files);
+  if (chatInput) { chatInput.value = ""; chatInput.style.height = "auto"; }
+
+  // Show thinking indicator
+  const thinkingId = addThinkingMessage();
+
   isGenerating = true;
-  const submitBtn = document.getElementById("generative-submit-btn");
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Generating..."; }
-
   try {
-    const messages = await buildMessages(prompt, file);
+    const messages = await buildMessages(prompt, files);
     const text = await generateWithClaude(messages, state.majorKey || "general");
-    addOutputCard(prompt, file?.name, text);
-    const input = document.getElementById("generative-input");
-    if (input) input.value = "";
+    removeMessage(thinkingId);
+    addClaudeMessage(text);
   } catch (err) {
-    showGenerativeError("Error: " + err.message);
+    removeMessage(thinkingId);
+    addErrorMessage("Error: " + err.message);
   } finally {
     isGenerating = false;
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "✨ Generate"; }
   }
 }
 
-async function buildMessages(prompt, file) {
+function addUserMessage(prompt, files) {
+  const messages = document.getElementById("chat-messages");
+  if (!messages) return;
+
+  const div = document.createElement("div");
+  div.className = "chat-msg user";
+  div.innerHTML = `
+    <div class="chat-avatar user-avatar">👤</div>
+    <div>
+      <div class="chat-sender">You</div>
+      ${files.map(f => `<div class="chat-file-card">${getFileEmoji(f)} ${f.name}</div>`).join("")}
+      ${prompt ? `<div class="chat-bubble">${escapeHtml(prompt)}</div>` : ""}
+    </div>
+  `;
+  messages.appendChild(div);
+  scrollToBottom();
+}
+
+function addClaudeMessage(text) {
+  const messages = document.getElementById("chat-messages");
+  if (!messages) return;
+
+  const div = document.createElement("div");
+  div.className = "chat-msg claude";
+  div.innerHTML = `
+    <div class="chat-avatar claude-avatar">A</div>
+    <div>
+      <div class="chat-sender">Claude</div>
+      <div class="chat-bubble">${formatResponse(text)}</div>
+    </div>
+  `;
+  messages.appendChild(div);
+  scrollToBottom();
+}
+
+function addThinkingMessage() {
+  const messages = document.getElementById("chat-messages");
+  if (!messages) return null;
+
+  const id = "thinking-" + Date.now();
+  const div = document.createElement("div");
+  div.className = "chat-msg claude";
+  div.id = id;
+  div.innerHTML = `
+    <div class="chat-avatar claude-avatar">A</div>
+    <div>
+      <div class="chat-sender">Claude</div>
+      <div class="chat-bubble">
+        <div class="chat-thinking">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  `;
+  messages.appendChild(div);
+  scrollToBottom();
+  return id;
+}
+
+function removeMessage(id) {
+  if (!id) return;
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function addErrorMessage(text) {
+  const messages = document.getElementById("chat-messages");
+  if (!messages) return;
+  const div = document.createElement("div");
+  div.className = "chat-error";
+  div.textContent = text;
+  messages.appendChild(div);
+  scrollToBottom();
+  setTimeout(() => div.remove(), 6000);
+}
+
+function scrollToBottom() {
+  const messages = document.getElementById("chat-messages");
+  if (messages) messages.scrollTop = messages.scrollHeight;
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+}
+
+function formatResponse(text) {
+  return text
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/^### (.*$)/gm, "<h4>$1</h4>")
+    .replace(/^## (.*$)/gm, "<h3>$1</h3>")
+    .replace(/^# (.*$)/gm, "<h3>$1</h3>")
+    .replace(/^- (.*$)/gm, "<li>$1</li>")
+    .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+    .replace(/\n\n/g, "<br><br>")
+    .replace(/\n/g, "<br>");
+}
+
+async function buildMessages(prompt, files) {
   const content = [];
 
-  if (file) {
+  for (const file of files) {
     const type = SUPPORTED_TYPES[file.type];
     if (type === "image") {
       const base64 = await fileToBase64(file);
@@ -135,7 +243,7 @@ async function buildMessages(prompt, file) {
     }
   }
 
-  content.push({ type: "text", text: prompt || "Please analyze this file and provide key insights." });
+  content.push({ type: "text", text: prompt || "Please analyze the uploaded file(s) and provide key insights." });
   return [{ role: "user", content }];
 }
 
@@ -151,71 +259,19 @@ async function fileToBase64(file) {
 async function extractDocx(file) {
   try {
     const mammoth = await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.esm.js");
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value || "Could not extract text from DOCX.";
-  } catch (e) {
-    return `[Could not read DOCX: ${e.message}]`;
-  }
+    const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return result.value || "Could not extract text.";
+  } catch (e) { return `[Could not read DOCX: ${e.message}]`; }
 }
 
 async function extractXlsx(file) {
   try {
     const XLSX = await import("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/xlsx.mjs");
-    const arrayBuffer = await file.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+    const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
     let text = "";
     workbook.SheetNames.forEach(name => {
       text += `Sheet: ${name}\n${XLSX.utils.sheet_to_csv(workbook.Sheets[name])}\n\n`;
     });
-    return text || "Could not extract text from file.";
-  } catch (e) {
-    return `[Could not read file: ${e.message}]`;
-  }
-}
-
-function addOutputCard(prompt, fileName, response) {
-  const area = document.getElementById("generative-output-area");
-  if (!area) return;
-  const card = document.createElement("div");
-  card.className = "output-card";
-  const title = prompt ? (prompt.length > 60 ? prompt.substring(0, 60) + "..." : prompt) : fileName || "Analysis";
-  card.innerHTML = `
-    <div class="output-card-header">
-      <span class="output-card-title">✨ ${title}</span>
-      <button class="output-copy-btn" title="Copy to clipboard">📋</button>
-    </div>
-    ${fileName ? `<div class="output-card-file">📄 ${fileName}</div>` : ""}
-    <div class="output-card-body">${formatResponse(response)}</div>
-  `;
-  card.querySelector(".output-copy-btn")?.addEventListener("click", () => {
-    navigator.clipboard.writeText(response).then(() => {
-      const btn = card.querySelector(".output-copy-btn");
-      if (btn) { btn.textContent = "✅"; setTimeout(() => btn.textContent = "📋", 2000); }
-    });
-  });
-  area.insertBefore(card, area.firstChild);
-}
-
-function formatResponse(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/^### (.*$)/gm, "<h4>$1</h4>")
-    .replace(/^## (.*$)/gm, "<h3>$1</h3>")
-    .replace(/^# (.*$)/gm, "<h3>$1</h3>")
-    .replace(/^- (.*$)/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
-    .replace(/\n\n/g, "<br><br>")
-    .replace(/\n/g, "<br>");
-}
-
-function showGenerativeError(msg) {
-  const area = document.getElementById("generative-output-area");
-  if (!area) return;
-  const err = document.createElement("div");
-  err.className = "generative-error";
-  err.textContent = msg;
-  area.insertBefore(err, area.firstChild);
-  setTimeout(() => err.remove(), 5000);
+    return text || "Could not extract text.";
+  } catch (e) { return `[Could not read file: ${e.message}]`; }
 }

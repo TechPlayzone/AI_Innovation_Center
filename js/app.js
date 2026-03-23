@@ -1,39 +1,46 @@
-// app.js
+// app.js v6.0
 // Frontend orchestrator — wires everything together
 
 import { getHeygenSessionToken } from "./services/backendApi.js";
 import { startHeygenSession, stopHeygenSession, hgSend } from "./services/heygenClient.js";
 import { connectElevenLabs, disconnectElevenLabs, startMicrophone, stopMicrophone, clearReconnectTimer } from "./services/elevenLabsClient.js";
 import { showWayneLoading, setLoadingText, resetWaynePanel, setWayneStatus } from "./panels/waynePanel.js";
-import { clearTranscript } from "./panels/transcriptPanel.js";
+import { initTranscriptPanel, clearTranscript } from "./panels/transcriptPanel.js";
 import { initWorkspacePanel, renderMajorWorkspace, enableSuggestedQuestions, disableSuggestedQuestions } from "./panels/workspacePanel.js";
+import { initGenerativePanel } from "./panels/generativePanel.js";
 import { state, resetAudioState } from "./state/sessionState.js";
 
 const startBtn    = document.getElementById("startBtn");
 const stopBtn     = document.getElementById("stopBtn");
 const majorSelect = document.getElementById("majorSelect");
 
+// ===== INIT =====
+initTranscriptPanel();
+initWorkspacePanel();
+initGenerativePanel();
+
 // ===== TOKEN PREFETCH =====
 async function prefetchToken() {
   try {
     const token = await getHeygenSessionToken();
     state.prefetchedToken = token;
-    console.log("[App] Token pre-fetched and ready");
+    console.log("[App] Token pre-fetched");
   } catch (e) {
-    console.log("[App] Prefetch failed (will retry on Start): " + e.message);
+    console.log("[App] Prefetch failed: " + e.message);
     state.prefetchedToken = null;
   }
 }
 
 prefetchToken();
-initWorkspacePanel();
 
-majorSelect.addEventListener("change", () => {
+// Update sidebar when major changes
+majorSelect?.addEventListener("change", () => {
   renderMajorWorkspace(majorSelect.value);
+  state.majorKey = majorSelect.value;
 });
 
 // ===== START SESSION =====
-startBtn.addEventListener("click", async () => {
+startBtn?.addEventListener("click", async () => {
   if (state.isStarting || state.sessionActive) return;
 
   state.isStarting = true;
@@ -58,8 +65,6 @@ startBtn.addEventListener("click", async () => {
     if (!sessionToken) {
       setLoadingText("Getting session token...");
       sessionToken = await getHeygenSessionToken();
-    } else {
-      console.log("[App] Using pre-fetched token");
     }
 
     setLoadingText("Connecting avatar...");
@@ -92,7 +97,7 @@ startBtn.addEventListener("click", async () => {
 });
 
 // ===== STOP SESSION =====
-stopBtn.addEventListener("click", async () => {
+stopBtn?.addEventListener("click", async () => {
   if (state.isStopping) return;
   state.isStopping = true;
   startBtn.disabled = true;
@@ -101,7 +106,7 @@ stopBtn.addEventListener("click", async () => {
 
   try {
     await cleanupSession();
-    setWayneStatus("Session ended.");
+    setWayneStatus("Session ended. Select your major and click Start Session.");
     startBtn.disabled = false;
     stopBtn.style.display = "none";
   } finally {
