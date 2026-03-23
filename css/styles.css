@@ -25,9 +25,9 @@
   --gradient-dim:  linear-gradient(135deg, var(--cyan-dim) 0%, var(--purple-dim) 100%);
   --gradient-glow: linear-gradient(135deg, var(--cyan-glow) 0%, var(--purple-glow) 100%);
 
-  --text-primary:  #e8eaf0;
-  --text-secondary:#8892a4;
-  --text-muted:    #3a4255;
+  --text-primary:  #f0f2f8;
+  --text-secondary:#b0bcd0;
+  --text-muted:    #5a6880;
 
   --border:        rgba(255,255,255,0.06);
   --border-accent: rgba(0, 212, 255, 0.2);
@@ -222,7 +222,7 @@ body::before {
 
 .sidebar-sublabel {
   font-size: 10.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-style: italic;
   line-height: 1.4;
 }
@@ -824,13 +824,15 @@ body::before {
 /* ===== VERSION TAG ===== */
 .version-tag {
   text-align: center;
-  color: var(--text-muted);
-  font-size: 10px;
-  padding: 6px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 7px;
   flex-shrink: 0;
   letter-spacing: 0.5px;
   position: relative;
   z-index: 1;
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel);
 }
 
 /* ===== SCROLLBARS ===== */
