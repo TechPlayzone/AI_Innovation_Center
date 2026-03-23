@@ -329,3 +329,17 @@ button {
 #wayne-splash.hidden {
   display: none;
 }
+
+/* ===== SUGGESTED QUESTIONS - DISABLED STATE ===== */
+.suggested-question.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ask-wayne-hint {
+  font-size: 11px;
+  color: #445;
+  font-style: italic;
+  margin-bottom: 8px;
+}

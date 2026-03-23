@@ -238,3 +238,15 @@ export function disconnectElevenLabs() {
     elWs = null;
   }
 }
+
+export function sendTextToWayne(text) {
+  if (!elWs || elWs.readyState !== WebSocket.OPEN) {
+    console.log("[ElevenLabs Client] Cannot send text — WebSocket not open");
+    return;
+  }
+  elWs.send(JSON.stringify({
+    type: "user_message",
+    text: text
+  }));
+  console.log("[ElevenLabs Client] Text sent to Wayne: " + text);
+}

@@ -6,7 +6,7 @@ import { startHeygenSession, stopHeygenSession, hgSend } from "./services/heygen
 import { connectElevenLabs, disconnectElevenLabs, startMicrophone, stopMicrophone, unmuteMic, clearReconnectTimer } from "./services/elevenLabsClient.js";
 import { showWayneLoading, setLoadingText, hideWayneLoading, resetWaynePanel, setWayneStatus } from "./panels/waynePanel.js";
 import { clearTranscript } from "./panels/transcriptPanel.js";
-import { initWorkspacePanel, renderMajorWorkspace } from "./panels/workspacePanel.js";
+import { initWorkspacePanel, renderMajorWorkspace, enableSuggestedQuestions, disableSuggestedQuestions } from "./panels/workspacePanel.js";
 import { state, resetAudioState } from "./state/sessionState.js";
 
 const startBtn = document.getElementById("startBtn");
@@ -82,6 +82,7 @@ startBtn.addEventListener("click", async () => {
 
     state.sessionActive = true;
     stopBtn.style.display = "inline-block";
+    enableSuggestedQuestions();
     prefetchToken();
 
   } catch (error) {
@@ -124,6 +125,8 @@ async function cleanupSession() {
   stopMicrophone();
   await stopHeygenSession();
   resetWaynePanel();
+  clearTranscript();
+  disableSuggestedQuestions();
   majorSelect.disabled = false;
   state.sessionActive = false;
 }
