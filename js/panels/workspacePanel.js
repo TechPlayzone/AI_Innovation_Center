@@ -4,8 +4,24 @@
 import { WORKSPACE_CONTENT } from "../config/workspaceContent.js";
 
 export function initWorkspacePanel() {
-  // Show general content by default
-  renderMajorWorkspace("general");
+  const panel = document.getElementById("workspace-panel");
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <div class="workspace-welcome">
+      <div class="welcome-icon">🎓</div>
+      <div class="welcome-title">Your AI Field Guide Workspace</div>
+      <div class="welcome-body">
+        <p>This panel is your personalized AI learning space. Here's what you'll find once you select your major:</p>
+        <ul class="welcome-list">
+          <li>🛠️ <strong>Key AI Tools</strong> — the top AI tools professionals in your field are using right now</li>
+          <li>💡 <strong>Real-World Use Cases</strong> — how AI is actually being applied in your industry today</li>
+          <li>🎤 <strong>Ask Wayne</strong> — suggested questions to get the most out of your conversation</li>
+        </ul>
+        <p class="welcome-hint">👆 Select your major from the dropdown above, then click <strong>Start Session</strong> to begin talking with Wayne.</p>
+      </div>
+    </div>
+  `;
 }
 
 export function renderMajorWorkspace(majorKey) {
