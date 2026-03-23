@@ -3,7 +3,7 @@
 // All API keys and secrets stay on the backend
 
 const FIREBASE_TOKEN_URL    = "https://getsessiontoken-s727ay3xwq-uc.a.run.app";
-const FIREBASE_GENERATE_URL = "https://us-central1-ai-field-agent-80585.cloudfunctions.net/generateWithClaude";
+const FIREBASE_GENERATE_URL = "https://generatewithclaude-s727ay3xwq-uc.a.run.app";
 
 export async function getHeygenSessionToken() {
   const res = await fetch(FIREBASE_TOKEN_URL);
