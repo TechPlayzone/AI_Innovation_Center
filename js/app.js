@@ -39,6 +39,27 @@ majorSelect?.addEventListener("change", () => {
   state.majorKey = majorSelect.value;
 });
 
+// ===== MIC MUTE BUTTON =====
+const micMuteBtn = document.getElementById("mic-mute-btn");
+let micMuted = false;
+
+micMuteBtn?.addEventListener("click", () => {
+  if (!state.sessionActive) return;
+  micMuted = !micMuted;
+
+  // Access mic stream through elevenLabsClient
+  import("./services/elevenLabsClient.js").then(({ getMicStream }) => {
+    const stream = getMicStream();
+    if (stream) {
+      stream.getAudioTracks().forEach(t => t.enabled = !micMuted);
+    }
+  });
+
+  micMuteBtn.textContent = micMuted ? "🔇 Mic Off" : "🎙️ Mic On";
+  micMuteBtn.className = micMuted ? "muted" : "";
+  setWayneStatus(micMuted ? "Microphone muted." : "Microphone active.");
+});
+
 // ===== START SESSION =====
 startBtn?.addEventListener("click", async () => {
   if (state.isStarting || state.sessionActive) return;
@@ -129,4 +150,6 @@ async function cleanupSession() {
   disableSuggestedQuestions();
   majorSelect.disabled = false;
   state.sessionActive = false;
+  micMuted = false;
+  if (micMuteBtn) { micMuteBtn.textContent = "🎙️ Mic On"; micMuteBtn.className = ""; }
 }

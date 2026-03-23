@@ -406,7 +406,7 @@ body {
 #chat-input:focus { outline: none; border-color: #0097A7; }
 #chat-input::placeholder { color: #334; }
 
-#chat-mic-btn, #chat-send-btn {
+#chat-send-btn {
   background: transparent;
   border: none;
   font-size: 20px;
@@ -416,7 +416,7 @@ body {
   transition: background 0.15s;
   flex-shrink: 0;
 }
-#chat-mic-btn:hover, #chat-send-btn:hover { background: #1a2a3a; }
+#chat-send-btn:hover { background: #1a2a3a; }
 #chat-send-btn { color: #0097A7; font-size: 22px; }
 
 /* ===== RIGHT PANEL ===== */
@@ -483,6 +483,35 @@ body {
   padding: 8px;
   border-bottom: 1px solid #1a2a3a;
   flex-shrink: 0;
+}
+
+#wayne-controls {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  border-bottom: 1px solid #1a2a3a;
+  flex-shrink: 0;
+}
+
+#mic-mute-btn {
+  background: #0a2a0a;
+  border: 1px solid #1a4a1a;
+  color: #81C784;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+#mic-mute-btn:hover { background: #0f3a0f; }
+
+#mic-mute-btn.muted {
+  background: #2a0a0a;
+  border-color: #4a1a1a;
+  color: #ef5350;
 }
 
 /* Transcript section */

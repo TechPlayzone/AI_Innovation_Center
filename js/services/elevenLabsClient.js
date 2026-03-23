@@ -234,3 +234,7 @@ export function sendTextToWayne(text) {
   }));
   console.log("[ElevenLabs Client] Text sent to Wayne: " + text);
 }
+
+export function getMicStream() {
+  return micStream;
+}

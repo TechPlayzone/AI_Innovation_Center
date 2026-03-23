@@ -86,7 +86,6 @@
         <label for="chat-file-attach" class="attach-btn" title="Attach file">📎</label>
         <input type="file" id="chat-file-attach" accept=".png,.jpg,.jpeg,.webp,.gif,.pdf,.txt,.csv,.docx,.pptx,.xlsx" style="display:none" />
         <textarea id="chat-input" placeholder="Ask Claude a question or upload files above..." rows="1"></textarea>
-        <button id="chat-mic-btn" title="Using microphone for Wayne">🎙️</button>
         <button id="chat-send-btn" title="Send to Claude">➤</button>
       </div>
     </div>
@@ -103,6 +102,9 @@
         </div>
       </div>
       <div id="wayne-label">Wayne, Your AI Field Guide</div>
+      <div id="wayne-controls">
+        <button id="mic-mute-btn" title="Mute/unmute your microphone">🎙️ Mic On</button>
+      </div>
 
       <!-- Transcript -->
       <div id="transcript-section">
