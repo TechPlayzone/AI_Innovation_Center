@@ -1,9 +1,10 @@
 // panels/workspacePanel.js
-// Owns the workspace panel — AI tools, use cases, suggested questions for each major
+// Owns the workspace panel — AI tools, use cases, suggested questions, generative input
 
 import { WORKSPACE_CONTENT } from "../config/workspaceContent.js";
 import { sendTextToWayne } from "../services/elevenLabsClient.js";
 import { addTranscriptMessage } from "./transcriptPanel.js";
+import { renderGenerativePanel } from "./generativePanel.js";
 import { state } from "../state/sessionState.js";
 
 export function initWorkspacePanel() {
@@ -20,6 +21,7 @@ export function initWorkspacePanel() {
           <li>🛠️ <strong>Key AI Tools</strong> — the top AI tools professionals in your field are using right now</li>
           <li>💡 <strong>Real-World Use Cases</strong> — how AI is actually being applied in your industry today</li>
           <li>🎤 <strong>Ask Wayne</strong> — click any question to have Wayne answer it out loud</li>
+          <li>✨ <strong>Ask Claude</strong> — type a question or upload a file and get an instant written response</li>
         </ul>
         <p class="welcome-hint">👆 Select your major from the dropdown above, then click <strong>Start Session</strong> to begin talking with Wayne.</p>
       </div>
@@ -68,7 +70,7 @@ export function renderMajorWorkspace(majorKey) {
     </div>
   `;
 
-  // Wire up click handlers
+  // Wire up suggested question clicks
   panel.querySelectorAll(".suggested-question").forEach(el => {
     el.addEventListener("click", () => {
       if (!state.sessionActive) return;
@@ -78,6 +80,9 @@ export function renderMajorWorkspace(majorKey) {
       if (statusEl) statusEl.textContent = `You asked: "${el.dataset.question}"`;
     });
   });
+
+  // Add generative panel below
+  renderGenerativePanel(panel);
 }
 
 export function enableSuggestedQuestions() {
