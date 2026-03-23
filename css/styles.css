@@ -20,11 +20,11 @@
   --sky-glow:      rgba(59,158,255,0.12);
   --sky-border:    rgba(59,158,255,0.22);
 
-  --violet:        #7c5cfc;
-  --violet-light:  #ede9ff;
-  --violet-dim:    #6644e8;
-  --violet-glow:   rgba(124,92,252,0.12);
-  --violet-border: rgba(124,92,252,0.22);
+  --violet:        #4b2db5;
+  --violet-light:  #f3f1ff;
+  --violet-dim:    #3a1fa0;
+  --violet-glow:   rgba(75,45,181,0.10);
+  --violet-border: rgba(75,45,181,0.18);
 
   --gradient:      linear-gradient(135deg, var(--sky) 0%, var(--violet) 100%);
   --gradient-soft: linear-gradient(135deg, #e8f3ff 0%, #ede9ff 100%);
