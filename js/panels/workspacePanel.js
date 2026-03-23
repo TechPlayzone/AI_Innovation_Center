@@ -20,8 +20,8 @@ export function initWorkspacePanel() {
         <ul class="welcome-list">
           <li>🛠️ <strong>Key AI Tools</strong> — the top AI tools professionals in your field are using right now</li>
           <li>💡 <strong>Real-World Use Cases</strong> — how AI is actually being applied in your industry today</li>
-          <li>🎤 <strong>Ask Wayne</strong> — click any question to have Wayne answer it out loud</li>
-          <li>✨ <strong>Ask Claude</strong> — type a question or upload a file and get an instant written response</li>
+          <li>🎤 <strong>Suggested Questions</strong> — click any question to have Wayne answer it out loud</li>
+          <li>✨ <strong>Generative AI</strong> — type a question or upload a file and get an instant written response</li>
         </ul>
         <p class="welcome-hint">👆 Select your major from the dropdown above, then click <strong>Start Session</strong> to begin talking with Wayne.</p>
       </div>
@@ -60,7 +60,7 @@ export function renderMajorWorkspace(majorKey) {
     </div>
 
     <div class="workspace-section">
-      <div class="workspace-section-title">🎤 Ask Wayne</div>
+      <div class="workspace-section-title">🎤 Suggested Questions</div>
       <p class="ask-wayne-hint" id="ask-wayne-hint">Start a session to ask Wayne these questions out loud.</p>
       <div class="suggested-questions">
         ${content.suggestedQuestions.map(q => `

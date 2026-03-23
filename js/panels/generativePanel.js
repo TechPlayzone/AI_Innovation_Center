@@ -27,8 +27,8 @@ export function renderGenerativePanel(container) {
   section.className = "workspace-section generative-section";
   section.id = "generative-section";
   section.innerHTML = `
-    <div class="workspace-section-title">✨ Ask Claude</div>
-    <p class="generative-hint">Type a question or upload a file — Claude will analyze it and display the response here.</p>
+    <div class="workspace-section-title">✨ Generative AI</div>
+    <p class="generative-hint">Type a question or upload a file and get an instant written response.</p>
 
     <div class="generative-input-wrap">
       <textarea id="generative-input" placeholder="Type your question or describe what you want Claude to do with your file..." rows="3"></textarea>
