@@ -90,14 +90,16 @@ button {
 /* ===== SIDE BY SIDE LAYOUT ===== */
 #main-layout {
   display: flex;
+  flex-direction: row;
   gap: 16px;
   max-width: 1200px;
   margin: 0 auto 16px;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 #avatar-container {
   flex: 0 0 480px;
+  width: 480px;
   height: 360px;
   margin: 0;
 }
