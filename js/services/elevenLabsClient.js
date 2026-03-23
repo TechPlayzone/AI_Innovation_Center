@@ -1,5 +1,6 @@
 // services/elevenLabsClient.js
 // Frontend adapter for ElevenLabs conversational voice
+// Mic stays open always — no muting during Wayne's speech
 
 import { MAJORS } from "../config/majors.js";
 import { resamplePCM, base64ToInt16, int16ToBase64 } from "../utils/audioUtils.js";
@@ -15,20 +16,6 @@ let micStream = null;
 let micProcessor = null;
 let micContext = null;
 let reconnectTimer = null;
-
-export function muteMic() {
-  if (micStream && !state.micMuted) {
-    micStream.getAudioTracks().forEach(t => t.enabled = false);
-    state.micMuted = true;
-  }
-}
-
-export function unmuteMic() {
-  if (micStream && state.micMuted) {
-    micStream.getAudioTracks().forEach(t => t.enabled = true);
-    state.micMuted = false;
-  }
-}
 
 function bridgeAudio(audioBase64) {
   const pcmOriginal = base64ToInt16(audioBase64);
@@ -57,7 +44,7 @@ export async function startMicrophone() {
   const source = micContext.createMediaStreamSource(micStream);
   micProcessor = micContext.createScriptProcessor(4096, 1, 1);
   micProcessor.onaudioprocess = (e) => {
-    if (!elWs || elWs.readyState !== WebSocket.OPEN || state.micMuted) return;
+    if (!elWs || elWs.readyState !== WebSocket.OPEN) return;
     const float32 = e.inputBuffer.getChannelData(0);
     const int16 = new Int16Array(float32.length);
     for (let i = 0; i < float32.length; i++) {
@@ -68,7 +55,7 @@ export async function startMicrophone() {
   };
   source.connect(micProcessor);
   micProcessor.connect(micContext.destination);
-  console.log("[ElevenLabs Client] Microphone started");
+  console.log("[ElevenLabs Client] Microphone started — always open");
 }
 
 export function stopMicrophone() {
@@ -156,8 +143,8 @@ export function connectElevenLabs(majorKey) {
           const fmt = meta.agent_output_audio_format || "pcm_16000";
           const rate = parseInt(fmt.replace("pcm_", ""));
           if (!isNaN(rate)) state.elOutputRate = rate;
-          setWayneStatus("Connected! Speak to Wayne.");
-          addTranscriptMessage("system", "Session started. Wayne is ready.");
+          setWayneStatus("Connected! Speak to Wayne anytime.");
+          addTranscriptMessage("system", "Session started. Wayne is ready — speak or click a question.");
           hgSend({ type: "agent.start_listening" });
           break;
         }
@@ -173,9 +160,8 @@ export function connectElevenLabs(majorKey) {
           if (audioB64) {
             if (!state.isSpeaking) {
               state.isSpeaking = true;
-              muteMic();
               hgSend({ type: "agent.stop_listening" });
-              setWayneStatus("Wayne is speaking...");
+              setWayneStatus("Wayne is speaking... (you can interrupt anytime)");
             }
             bridgeAudio(audioB64);
           }
@@ -202,7 +188,6 @@ export function connectElevenLabs(majorKey) {
           hgSend({ type: "agent.interrupt" });
           hgSend({ type: "agent.start_listening" });
           state.isSpeaking = false;
-          unmuteMic();
           setWayneStatus("Listening...");
           break;
         }
@@ -214,7 +199,6 @@ export function connectElevenLabs(majorKey) {
                 hgSend({ type: "agent.speak_end" });
                 hgSend({ type: "agent.start_listening" });
                 state.isSpeaking = false;
-                unmuteMic();
                 setWayneStatus("Listening...");
               } else {
                 setTimeout(waitForQueue, 30);

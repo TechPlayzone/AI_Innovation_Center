@@ -3,7 +3,7 @@
 
 import { getHeygenSessionToken } from "./services/backendApi.js";
 import { startHeygenSession, stopHeygenSession, hgSend } from "./services/heygenClient.js";
-import { connectElevenLabs, disconnectElevenLabs, startMicrophone, stopMicrophone, unmuteMic, clearReconnectTimer } from "./services/elevenLabsClient.js";
+import { connectElevenLabs, disconnectElevenLabs, startMicrophone, stopMicrophone, clearReconnectTimer } from "./services/elevenLabsClient.js";
 import { showWayneLoading, setLoadingText, hideWayneLoading, resetWaynePanel, setWayneStatus } from "./panels/waynePanel.js";
 import { clearTranscript } from "./panels/transcriptPanel.js";
 import { initWorkspacePanel, renderMajorWorkspace, enableSuggestedQuestions, disableSuggestedQuestions } from "./panels/workspacePanel.js";
@@ -69,7 +69,6 @@ startBtn.addEventListener("click", async () => {
     await startHeygenSession(sessionToken, () => {
       // onSpeakEnded callback
       state.isSpeaking = false;
-      unmuteMic();
       hgSend({ type: "agent.start_listening" });
       setWayneStatus("Listening...");
     });
