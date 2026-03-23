@@ -2,7 +2,7 @@
 // Frontend-safe entry point to all backend endpoints
 // All API keys and secrets stay on the backend
 
-const FIREBASE_TOKEN_URL = "https://getsessiontoken-s727ay3xwq-uc.a.run.app";
+const FIREBASE_GENERATE_URL = "https://us-central1-ai-field-agent-80585.cloudfunctions.net/generateWithClaude";
 
 export async function getHeygenSessionToken() {
   const res = await fetch(FIREBASE_TOKEN_URL);
