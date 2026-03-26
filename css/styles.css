@@ -196,7 +196,7 @@ body {
 
 /* ===== LEFT SIDEBAR ===== */
 #left-sidebar {
-  width: 248px;
+  width: 220px;
   flex-shrink: 0;
   background: rgba(255,255,255,0.7);
   backdrop-filter: blur(16px);
@@ -634,7 +634,7 @@ body {
 
 /* ===== RIGHT PANEL ===== */
 #right-panel {
-  width: 234px;
+  width: 340px;
   flex-shrink: 0;
   background: rgba(255,255,255,0.72);
   backdrop-filter: blur(16px);
@@ -647,7 +647,7 @@ body {
 
 #wayne-container {
   width: 100%;
-  height: 160px;
+  height: 280px;
   background: linear-gradient(160deg, #ddeeff 0%, #e8e0ff 100%);
   position: relative;
   flex-shrink: 0;
@@ -899,6 +899,6 @@ body {
   #app-layout { flex-direction: column; height: auto; }
   #left-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
   #right-panel { width: 100%; }
-  #wayne-container { height: 200px; }
+  #wayne-container { height: 260px; }
   #top-bar-center { display: none; }
 }
