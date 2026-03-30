@@ -1,6 +1,6 @@
 /* ============================================
-   AI in My Field — v7.1
-   Glassmorphism · Sky-Blue / Violet · Vibrant
+   AI in My Field — v7.2
+   Glassmorphism · Floating Cards · Sky-Blue / Violet
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
@@ -195,7 +195,8 @@ body {
   height: calc(100vh - 46px - 24px - 22px);
   position: relative;
   z-index: 1;
-  gap: 0;
+  gap: 10px;
+  padding: 10px 12px;
 }
 
 /* ===== LEFT SIDEBAR ===== */
@@ -205,13 +206,14 @@ body {
   background: rgba(255,255,255,0.55);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-right: 1px solid var(--border-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
   overflow-y: auto;
-  padding: 12px 12px;
+  padding: 14px 12px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: inset -1px 0 0 rgba(255,255,255,0.4);
+  box-shadow: var(--shadow-glass);
 }
 
 #left-sidebar::-webkit-scrollbar { width: 3px; }
@@ -337,9 +339,11 @@ body {
   background: rgba(240,245,255,0.45);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border-right: 1px solid var(--border-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
   min-width: 0;
   overflow: hidden;
+  box-shadow: var(--shadow-glass);
 }
 
 #center-header {
@@ -659,8 +663,9 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-left: 1px solid var(--border-glass);
-  box-shadow: inset 1px 0 0 rgba(255,255,255,0.5);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-glass);
 }
 
 #wayne-container {
@@ -670,6 +675,7 @@ body {
   position: relative;
   flex-shrink: 0;
   overflow: hidden;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 /* Soft frame around Wayne */
@@ -931,9 +937,10 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  #app-layout { flex-direction: column; height: auto; }
-  #left-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
-  #right-panel { width: 100%; }
-  #wayne-container { height: 260px; }
+  #app-layout { flex-direction: column; height: auto; padding: 8px; gap: 8px; }
+  #left-sidebar { width: 100%; border-radius: var(--radius-lg); }
+  #center-panel { border-radius: var(--radius-lg); }
+  #right-panel { width: 100%; border-radius: var(--radius-lg); }
+  #wayne-container { height: 260px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   #top-bar-center { display: none; }
 }
