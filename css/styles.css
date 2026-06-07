@@ -438,6 +438,17 @@ body {
   font-size: 13px;
 }
 
+.how-to-list {
+  padding-left: 1.2rem;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #ccc;
+}
+.how-to-list li {
+  margin-bottom: 4px;
+}
+
 /* Chat messages */
 #chat-messages {
   flex: 1;
